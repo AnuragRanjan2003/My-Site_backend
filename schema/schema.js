@@ -1,4 +1,5 @@
 const graphql = require('graphql');
+const User = require('../models/user');
 
 const {
     GraphQLObjectType,
@@ -6,8 +7,11 @@ const {
     GraphQLString,
     GraphQLBoolean,
     GraphQLSchema,
-    GraphQLNonNull
+    GraphQLNonNull,
+    GraphQLList
 } = graphql;
+
+//Dummy data for testing purposes
 
 const Users = [{
         id: '1',
@@ -61,11 +65,17 @@ const RootQuery = new GraphQLObjectType({
             type: UserType,
             args: {
                 email: {
-                    type: GraphQLString
+                    type: new GraphQLNonNull(GraphQLString)
                 }
             },
             resolve(parent, args) {
-                return Users.find((user) => user.email == args.email);
+                return User.findOne({ email: args.email});
+            }
+        },
+        users : {
+            type : new GraphQLList(UserType),
+            resolve(parent, args) {
+                return User.find({});
             }
         }
     }
@@ -88,14 +98,13 @@ const mutations = new GraphQLObjectType({
                 }
             },
             resolve(parent, args) {
-                let user = {
+                let user  = new User({
                     email: args.email,
                     password: args.password,
                     admin: args.admin
-                } 
-                Users.push(user);
-                console.log(Users.length);
-                return user;
+                })
+                console.log(`User added ${user}`);
+                return user.save();
             }
         }
     }
