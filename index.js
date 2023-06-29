@@ -8,6 +8,10 @@ require('dotenv').config();
 
 const app = express();
 
+app.get('/', function (req, res) {
+    res.send('Welcome to graphql server');
+});
+
 mongoose.connect(process.env.MONGODBURI);
 
 mongoose.connection.once('open', () => {
