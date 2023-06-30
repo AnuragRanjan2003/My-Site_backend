@@ -9,7 +9,11 @@ require('dotenv').config();
 const app = express();
 
 app.get('/', function (req, res) {
-    res.send('Welcome to graphql server');
+    console.log("api was hit by -->  "+req.ip);
+    res.send({
+        status: 200,
+        message : "Welcome to graphql."
+    });
 });
 
 mongoose.connect(process.env.MONGODBURI);
