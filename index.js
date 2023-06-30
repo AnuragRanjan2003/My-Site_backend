@@ -16,13 +16,13 @@ app.get('/', function (req, res) {
     });
 });
 
-mongoose.connect(process.env.MONGODBURI);
+mongoose.connect(`${process.env.MONGODBURI}`);
 
 mongoose.connection.once('open', () => {
     console.log('connected to mongodb');
 }).once('close', () => {
     console.log('disconnected from mongodb');
-}).once('error', () => {
+}).once('error', (err) => {
     console.log(`mongo db error : ${err}`);
 });
 
