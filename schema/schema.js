@@ -69,13 +69,38 @@ const RootQuery = new GraphQLObjectType({
                 }
             },
             resolve(parent, args) {
-                return User.findOne({ email: args.email});
+                return User.findOne({
+                    email: args.email
+                });
             }
         },
-        users : {
-            type : new GraphQLList(UserType),
+        users: {
+            type: new GraphQLList(UserType),
             resolve(parent, args) {
                 return User.find({});
+            }
+        },
+
+        logInUser: {
+            type: UserType,
+            args: {
+                email: {
+                    type: new GraphQLNonNull(GraphQLString)
+                },
+                password: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve: async (parent, args) => {
+                let result = null;
+                result = await User.findOne({
+                    email: args.email,
+                    password: args.password
+                });
+
+                if(result === null) result ={ id : "wrong credentials" , email : "wrong credentials", password : "wrong credentials"}
+
+                return result;
             }
         }
     }
@@ -97,14 +122,32 @@ const mutations = new GraphQLObjectType({
                     type: new GraphQLNonNull(GraphQLBoolean)
                 }
             },
-            resolve(parent, args) {
-                let user  = new User({
+            resolve: async (parent, args) => {
+                let user = new User({
                     email: args.email,
                     password: args.password,
                     admin: args.admin
                 })
-                console.log(`User added ${user}`);
+                let result = null;
+                result = await User.findOne({
+                    email: args.email
+                });
+                console.log(`result value : ${result}`);
+
+                if (result != null) {
+                    return {
+                        email: "email alread exists",
+                        password: "email already exists",
+                        admin: "email alread exists",
+                        id: "user already exists"
+                    };
+                }
+
                 return user.save();
+
+
+
+
             }
         }
     }
