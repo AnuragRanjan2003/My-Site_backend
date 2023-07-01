@@ -11,34 +11,6 @@ const {
     GraphQLList
 } = graphql;
 
-//Dummy data for testing purposes
-
-const Users = [{
-        id: '1',
-        email: 'foo@bar.com',
-        password: 'abc',
-        admin: true
-    },
-    {
-        id: '2',
-        email: 'abc@mail.com',
-        password: '123',
-        admin: false
-    },
-    {
-        id: '3',
-        email: 'xyz@mail.com',
-        password: 'pqr',
-        admin: false
-    },
-    {
-        id: '3',
-        email: '123@mail.com',
-        password: '123',
-        admin: false
-    },
-];
-
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -138,7 +110,6 @@ const mutations = new GraphQLObjectType({
                     return {
                         email: "email alread exists",
                         password: "email already exists",
-                        admin: "email alread exists",
                         id: "user already exists"
                     };
                 }
