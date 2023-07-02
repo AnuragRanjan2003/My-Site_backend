@@ -1,5 +1,7 @@
 const graphql = require('graphql');
 const User = require('../models/user');
+const Blog = require('../models/blog');
+const mongoose = require('mongoose');
 
 const {
     GraphQLObjectType,
@@ -11,6 +13,23 @@ const {
     GraphQLList
 } = graphql;
 
+const BlogType = new GraphQLObjectType({
+    name: 'Blog',
+    fields: () => ({
+        id: { type: GraphQLID },
+        title: { type: GraphQLString },
+        discr: { type: GraphQLString },
+        user : {
+            type : UserType,
+            resolve(parent,args){
+                console.log(`received ${parent.authorID}`);
+                let authId = new mongoose.Types.ObjectId(parent.authorID);
+                console.log(`received _id ${authId}`);
+                return User.findById(authId);
+            }
+        }
+    }),
+});
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -26,9 +45,16 @@ const UserType = new GraphQLObjectType({
         },
         admin: {
             type: GraphQLBoolean
+        },
+        blogs : {
+            type: new GraphQLList(BlogType),
+            resolve(parent,args) {
+                return Blog.find({ authorID : parent.id});
+            }
         }
     }),
 });
+
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
@@ -70,10 +96,30 @@ const RootQuery = new GraphQLObjectType({
                     password: args.password
                 });
 
-                if(result === null) result ={ id : "wrong credentials" , email : "wrong credentials", password : "wrong credentials"}
+                if (result === null) result = {
+                    id: "wrong credentials",
+                    email: "wrong credentials",
+                    password: "wrong credentials"
+                }
 
                 return result;
             }
+        },
+
+        blog: {
+            type: BlogType,
+            args: {
+                id: {
+                    type: new GraphQLNonNull(GraphQLID)
+                }
+            },
+            resolve: async (parent, args) => {
+
+                let res = await Blog.findById(args.id);
+                console.log(`response from blog : ${res}`);
+                return res;
+            }
+
         }
     }
 });
@@ -119,6 +165,23 @@ const mutations = new GraphQLObjectType({
 
 
 
+            }
+        },
+        addBlog : {
+            type: BlogType,
+            args : {
+                title : {type :  new GraphQLNonNull(GraphQLString)},
+                discr : {type : new GraphQLNonNull(GraphQLString)},
+                authorID : {type : new GraphQLNonNull(GraphQLID)}
+            },
+            resolve : (parent,args) => {
+                let blog = new Blog({
+                    title : args.title,
+                    discr : args.discr,
+                    authorID : args.authorID
+                });
+                console.log(`blog : ${blog}`);
+                return blog.save();
             }
         }
     }
