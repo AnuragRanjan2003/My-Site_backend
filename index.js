@@ -1,7 +1,7 @@
 const express = require('express');
 const {
-    graphqlHTTP
-} = require('express-graphql');
+    createHandler,
+} = require('graphql-http/lib/use/express');
 const schema = require('./schema/schema');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -28,7 +28,7 @@ mongoose.connection.once('open', () => {
 
 
 
-app.use('/graphql', graphqlHTTP({
+app.all('/graphql', createHandler({
     schema,
     graphiql: true,
 }));
