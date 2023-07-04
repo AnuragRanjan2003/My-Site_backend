@@ -1,20 +1,10 @@
 const express = require('express');
-const {
-    graphqlHTTP
-} = require('express-graphql');
+const {graphqlHTTP} = require('express-graphql');
 const schema = require('./schema/schema');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-
-app.get('/', function (req, res) {
-    console.log("api was hit by -->  "+req.ip);
-    res.send({
-        status: 200,
-        message : "Welcome to graphql."
-    });
-});
 
 mongoose.connect(`${process.env.MONGODBURI}`);
 
@@ -25,6 +15,22 @@ mongoose.connection.once('open', () => {
 }).once('error', (err) => {
     console.log(`mongo db error : ${err}`);
 });
+
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
+
+app.get('/', function (req, res) {
+    console.log("api was hit by -->  "+req.ip);
+    res.send({
+        status: 200,
+        message : "Welcome to graphql."
+    });
+});
+
 
 
 
