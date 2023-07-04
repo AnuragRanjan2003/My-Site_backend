@@ -16,8 +16,11 @@ mongoose.connection.once('open', () => {
     console.log(`mongo db error : ${err}`);
 });
 
+console.log('cors is used');
+
 
 app.use((req, res, next) => {
+    console.log('going through cors');
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
