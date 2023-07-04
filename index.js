@@ -3,6 +3,7 @@ const {graphqlHTTP} = require('express-graphql');
 const schema = require('./schema/schema');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const cors = require('cors');
 
 const app = express();
 
@@ -18,13 +19,13 @@ mongoose.connection.once('open', () => {
 
 console.log('cors is used');
 
+app.use(cors({
+    origin: "*", // Allow requests from this origin
+    methods: ['GET', 'POST','OPTIONS'], // Allow specified HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization','Accept','Origin','X-Requested-With'],
+}))
 
-app.use((req, res, next) => {
-    console.log('going through cors');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
+app.options('*', cors());
 
 app.get('/', function (req, res) {
     console.log("api was hit by -->  "+req.ip);
